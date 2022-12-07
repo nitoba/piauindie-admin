@@ -24,6 +24,7 @@ export const userSchema = list({
       options: [
         { label: 'isAdmin', value: 'admin' },
         { label: 'isStudent', value: 'student' },
+        { label: 'isTeacher', value: 'teacher' },
       ],
       validation: { isRequired: true },
       ui: { displayMode: 'select' },
@@ -33,6 +34,7 @@ export const userSchema = list({
     }),
 
     enrollments: relationship({ ref: 'Enrollment.student', many: true }),
+    teachingIn: relationship({ ref: 'Course.teacher', many: true }),
 
     createdAt: timestamp({
       defaultValue: { kind: 'now' },

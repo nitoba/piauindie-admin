@@ -19,6 +19,7 @@ model User {
   role        UserRoleType
   password    String
   enrollments Enrollment[] @relation("Enrollment_student")
+  teachingIn  Course[]     @relation("Course_teacher")
   createdAt   DateTime?    @default(now())
 
   @@map("users")
@@ -31,9 +32,12 @@ model Course {
   slug        String       @unique @default("")
   enrolledOn  Enrollment[] @relation("Enrollment_course")
   lessons     Lesson[]     @relation("Lesson_course")
+  teacher     User?        @relation("Course_teacher", fields: [teacherId], references: [id])
+  teacherId   String?      @map("teacher")
   createdAt   DateTime?    @default(now())
   updatedAt   DateTime?    @default(now()) @updatedAt
 
+  @@index([teacherId])
   @@map("courses")
 }
 
@@ -69,4 +73,5 @@ model Lesson {
 enum UserRoleType {
   admin
   student
+  teacher
 }

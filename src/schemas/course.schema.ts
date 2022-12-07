@@ -23,8 +23,13 @@ export const courseSchema = list({
       },
     }),
 
-    enrolledOn: relationship({ ref: 'Enrollment.course', many: true }),
+    enrolledOn: relationship({
+      ref: 'Enrollment.course',
+      many: true,
+      ui: { createView: { fieldMode: 'hidden' } },
+    }),
     lessons: relationship({ ref: 'Lesson.course', many: true }),
+    teacher: relationship({ ref: 'User.teachingIn' }),
 
     createdAt: timestamp({
       defaultValue: { kind: 'now' },
