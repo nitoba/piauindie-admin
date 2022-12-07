@@ -2,9 +2,9 @@ import { list } from '@keystone-6/core'
 import { allOperations } from '@keystone-6/core/access'
 import { relationship, text, timestamp } from '@keystone-6/core/fields'
 import { isAdmin } from '../auth/permissions'
-import { validationSlugs } from '../utils/regexs'
+import { validationSlugs, validationURLs } from '../utils/regexs'
 
-export const courseSchema = list({
+export const lessonSchema = list({
   access: {
     operation: allOperations(isAdmin),
   },
@@ -23,8 +23,17 @@ export const courseSchema = list({
       },
     }),
 
-    enrolledOn: relationship({ ref: 'Enrollment.course', many: true }),
-    lessons: relationship({ ref: 'Lesson.course', many: true }),
+    videoUrl: text({
+      validation: {
+        isRequired: true,
+        match: {
+          regex: validationURLs,
+          explanation: 'This must be a valid url',
+        },
+      },
+    }),
+
+    course: relationship({ ref: 'Course.lessons' }),
 
     createdAt: timestamp({
       defaultValue: { kind: 'now' },
@@ -36,6 +45,6 @@ export const courseSchema = list({
       db: { updatedAt: true },
     }),
   },
-  ui: { label: 'Courses' },
-  db: { map: 'courses' },
+  ui: { label: 'Lessons' },
+  db: { map: 'lessons' },
 })

@@ -30,6 +30,7 @@ model Course {
   description String       @default("")
   slug        String       @unique @default("")
   enrolledOn  Enrollment[] @relation("Enrollment_course")
+  lessons     Lesson[]     @relation("Lesson_course")
   createdAt   DateTime?    @default(now())
   updatedAt   DateTime?    @default(now()) @updatedAt
 
@@ -48,6 +49,21 @@ model Enrollment {
   @@index([studentId])
   @@index([courseId])
   @@map("enrollments")
+}
+
+model Lesson {
+  id          String    @id @default(cuid())
+  title       String    @default("")
+  description String    @default("")
+  slug        String    @unique @default("")
+  videoUrl    String    @default("")
+  course      Course?   @relation("Lesson_course", fields: [courseId], references: [id])
+  courseId    String?   @map("course")
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @default(now()) @updatedAt
+
+  @@index([courseId])
+  @@map("lessons")
 }
 
 enum UserRoleType {

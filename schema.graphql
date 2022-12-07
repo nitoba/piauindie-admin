@@ -164,6 +164,8 @@ type Course {
   slug: String
   enrolledOn(where: EnrollmentWhereInput! = {}, orderBy: [EnrollmentOrderByInput!]! = [], take: Int, skip: Int! = 0): [Enrollment!]
   enrolledOnCount(where: EnrollmentWhereInput! = {}): Int
+  lessons(where: LessonWhereInput! = {}, orderBy: [LessonOrderByInput!]! = [], take: Int, skip: Int! = 0): [Lesson!]
+  lessonsCount(where: LessonWhereInput! = {}): Int
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -182,8 +184,15 @@ input CourseWhereInput {
   description: StringFilter
   slug: StringFilter
   enrolledOn: EnrollmentManyRelationFilter
+  lessons: LessonManyRelationFilter
   createdAt: DateTimeNullableFilter
   updatedAt: DateTimeNullableFilter
+}
+
+input LessonManyRelationFilter {
+  every: LessonWhereInput
+  some: LessonWhereInput
+  none: LessonWhereInput
 }
 
 input CourseOrderByInput {
@@ -200,8 +209,16 @@ input CourseUpdateInput {
   description: String
   slug: String
   enrolledOn: EnrollmentRelateToManyForUpdateInput
+  lessons: LessonRelateToManyForUpdateInput
   createdAt: DateTime
   updatedAt: DateTime
+}
+
+input LessonRelateToManyForUpdateInput {
+  disconnect: [LessonWhereUniqueInput!]
+  set: [LessonWhereUniqueInput!]
+  create: [LessonCreateInput!]
+  connect: [LessonWhereUniqueInput!]
 }
 
 input CourseUpdateArgs {
@@ -214,8 +231,14 @@ input CourseCreateInput {
   description: String
   slug: String
   enrolledOn: EnrollmentRelateToManyForCreateInput
+  lessons: LessonRelateToManyForCreateInput
   createdAt: DateTime
   updatedAt: DateTime
+}
+
+input LessonRelateToManyForCreateInput {
+  create: [LessonCreateInput!]
+  connect: [LessonWhereUniqueInput!]
 }
 
 type Enrollment {
@@ -288,6 +311,71 @@ input CourseRelateToOneForCreateInput {
   connect: CourseWhereUniqueInput
 }
 
+type Lesson {
+  id: ID!
+  title: String
+  description: String
+  slug: String
+  videoUrl: String
+  course: Course
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input LessonWhereUniqueInput {
+  id: ID
+  slug: String
+}
+
+input LessonWhereInput {
+  AND: [LessonWhereInput!]
+  OR: [LessonWhereInput!]
+  NOT: [LessonWhereInput!]
+  id: IDFilter
+  title: StringFilter
+  description: StringFilter
+  slug: StringFilter
+  videoUrl: StringFilter
+  course: CourseWhereInput
+  createdAt: DateTimeNullableFilter
+  updatedAt: DateTimeNullableFilter
+}
+
+input LessonOrderByInput {
+  id: OrderDirection
+  title: OrderDirection
+  description: OrderDirection
+  slug: OrderDirection
+  videoUrl: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input LessonUpdateInput {
+  title: String
+  description: String
+  slug: String
+  videoUrl: String
+  course: CourseRelateToOneForUpdateInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input LessonUpdateArgs {
+  where: LessonWhereUniqueInput!
+  data: LessonUpdateInput!
+}
+
+input LessonCreateInput {
+  title: String
+  description: String
+  slug: String
+  videoUrl: String
+  course: CourseRelateToOneForCreateInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
 """
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
@@ -312,6 +400,12 @@ type Mutation {
   updateEnrollments(data: [EnrollmentUpdateArgs!]!): [Enrollment]
   deleteEnrollment(where: EnrollmentWhereUniqueInput!): Enrollment
   deleteEnrollments(where: [EnrollmentWhereUniqueInput!]!): [Enrollment]
+  createLesson(data: LessonCreateInput!): Lesson
+  createLessons(data: [LessonCreateInput!]!): [Lesson]
+  updateLesson(where: LessonWhereUniqueInput!, data: LessonUpdateInput!): Lesson
+  updateLessons(data: [LessonUpdateArgs!]!): [Lesson]
+  deleteLesson(where: LessonWhereUniqueInput!): Lesson
+  deleteLessons(where: [LessonWhereUniqueInput!]!): [Lesson]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -344,6 +438,9 @@ type Query {
   enrollments(where: EnrollmentWhereInput! = {}, orderBy: [EnrollmentOrderByInput!]! = [], take: Int, skip: Int! = 0): [Enrollment!]
   enrollment(where: EnrollmentWhereUniqueInput!): Enrollment
   enrollmentsCount(where: EnrollmentWhereInput! = {}): Int
+  lessons(where: LessonWhereInput! = {}, orderBy: [LessonOrderByInput!]! = [], take: Int, skip: Int! = 0): [Lesson!]
+  lesson(where: LessonWhereUniqueInput!): Lesson
+  lessonsCount(where: LessonWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }
