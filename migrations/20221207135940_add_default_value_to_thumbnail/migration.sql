@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "courses" ADD COLUMN     "thumbnailUrl" TEXT NOT NULL DEFAULT 'https://img.freepik.com/vector-gratis/cursos-informatica-educacion-ti-oportunidades-aprendizaje-electronico-tecnologia-seminarios-web-responsable-taller-aprendizaje-online-distancia-e-internet-ilustracion-metafora-concepto-aislado-vector_335657-2830.jpg?w=740&t=st=1670420665~exp=1670421265~hmac=7c2e3cda297c97de576e6270ceed84c15aa7e7611644ce1748d395369a1b754f';

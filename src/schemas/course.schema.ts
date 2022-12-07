@@ -1,8 +1,16 @@
 import { list } from '@keystone-6/core'
 import { allOperations } from '@keystone-6/core/access'
-import { relationship, select, text, timestamp } from '@keystone-6/core/fields'
+import {
+  float,
+  integer,
+  relationship,
+  select,
+  text,
+  timestamp,
+} from '@keystone-6/core/fields'
 import { isAdmin } from '../auth/permissions'
-import { validationSlugs } from '../utils/regexs'
+import { DEFAULT_THUMBNAIL_URL_COURSE } from '../utils/contants'
+import { validationSlugs, validationURLs } from '../utils/regexs'
 
 export const courseSchema = list({
   access: {
@@ -22,14 +30,29 @@ export const courseSchema = list({
         },
       },
     }),
+    thumbnailUrl: text({
+      validation: {
+        isRequired: true,
+        match: {
+          regex: validationURLs,
+          explanation: 'Must be a valid URL',
+        },
+      },
 
-    enrolledOn: relationship({
-      ref: 'Enrollment.course',
-      many: true,
-      ui: { createView: { fieldMode: 'hidden' } },
+      defaultValue: DEFAULT_THUMBNAIL_URL_COURSE,
     }),
-    lessons: relationship({ ref: 'Lesson.course', many: true }),
-    teacher: relationship({ ref: 'User.teachingIn' }),
+
+    durationInMinutes: integer({
+      validation: { isRequired: true, min: 1 },
+      defaultValue: 1,
+    }),
+
+    price: float({
+      defaultValue: 0,
+      ui: {
+        description: 'Set a regular price (USD). Leave it blank for Free.',
+      },
+    }),
 
     courseEvaluation: select({
       type: 'integer',
@@ -40,7 +63,19 @@ export const courseSchema = list({
         { label: '4', value: 4 },
         { label: '5', value: 5 },
       ],
+
+      ui: {
+        createView: { fieldMode: 'hidden' },
+      },
     }),
+
+    enrolledOn: relationship({
+      ref: 'Enrollment.course',
+      many: true,
+      ui: { createView: { fieldMode: 'hidden' } },
+    }),
+    lessons: relationship({ ref: 'Lesson.course', many: true }),
+    teacher: relationship({ ref: 'User.teachingIn' }),
 
     createdAt: timestamp({
       defaultValue: { kind: 'now' },

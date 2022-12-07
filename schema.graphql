@@ -197,6 +197,10 @@ type Course {
   title: String
   description: String
   slug: String
+  thumbnailUrl: String
+  durationInMinutes: Int
+  price: Float
+  courseEvaluation: Int
   enrolledOn(
     where: EnrollmentWhereInput! = {}
     orderBy: [EnrollmentOrderByInput!]! = []
@@ -212,7 +216,6 @@ type Course {
   ): [Lesson!]
   lessonsCount(where: LessonWhereInput! = {}): Int
   teacher: User
-  courseEvaluation: Int
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -230,18 +233,37 @@ input CourseWhereInput {
   title: StringFilter
   description: StringFilter
   slug: StringFilter
+  thumbnailUrl: StringFilter
+  durationInMinutes: IntFilter
+  price: FloatNullableFilter
+  courseEvaluation: IntNullableFilter
   enrolledOn: EnrollmentManyRelationFilter
   lessons: LessonManyRelationFilter
   teacher: UserWhereInput
-  courseEvaluation: IntNullableFilter
   createdAt: DateTimeNullableFilter
   updatedAt: DateTimeNullableFilter
 }
 
-input LessonManyRelationFilter {
-  every: LessonWhereInput
-  some: LessonWhereInput
-  none: LessonWhereInput
+input IntFilter {
+  equals: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  not: IntFilter
+}
+
+input FloatNullableFilter {
+  equals: Float
+  in: [Float!]
+  notIn: [Float!]
+  lt: Float
+  lte: Float
+  gt: Float
+  gte: Float
+  not: FloatNullableFilter
 }
 
 input IntNullableFilter {
@@ -255,11 +277,20 @@ input IntNullableFilter {
   not: IntNullableFilter
 }
 
+input LessonManyRelationFilter {
+  every: LessonWhereInput
+  some: LessonWhereInput
+  none: LessonWhereInput
+}
+
 input CourseOrderByInput {
   id: OrderDirection
   title: OrderDirection
   description: OrderDirection
   slug: OrderDirection
+  thumbnailUrl: OrderDirection
+  durationInMinutes: OrderDirection
+  price: OrderDirection
   courseEvaluation: OrderDirection
   createdAt: OrderDirection
   updatedAt: OrderDirection
@@ -269,10 +300,13 @@ input CourseUpdateInput {
   title: String
   description: String
   slug: String
+  thumbnailUrl: String
+  durationInMinutes: Int
+  price: Float
+  courseEvaluation: Int
   enrolledOn: EnrollmentRelateToManyForUpdateInput
   lessons: LessonRelateToManyForUpdateInput
   teacher: UserRelateToOneForUpdateInput
-  courseEvaluation: Int
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -299,10 +333,13 @@ input CourseCreateInput {
   title: String
   description: String
   slug: String
+  thumbnailUrl: String
+  durationInMinutes: Int
+  price: Float
+  courseEvaluation: Int
   enrolledOn: EnrollmentRelateToManyForCreateInput
   lessons: LessonRelateToManyForCreateInput
   teacher: UserRelateToOneForCreateInput
-  courseEvaluation: Int
   createdAt: DateTime
   updatedAt: DateTime
 }
