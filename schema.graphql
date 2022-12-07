@@ -170,6 +170,7 @@ type Course {
 
 input CourseWhereUniqueInput {
   id: ID
+  slug: String
 }
 
 input CourseWhereInput {

@@ -11,7 +11,7 @@ export const courseSchema = list({
     title: text({ validation: { isRequired: true } }),
     description: text({ validation: { isRequired: true } }),
     slug: text({
-      isIndexed: true,
+      isIndexed: 'unique',
       validation: {
         isRequired: true,
         match: {

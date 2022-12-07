@@ -16,6 +16,26 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
 
 // keystone.ts
 var keystone_exports = {};
@@ -44,7 +64,7 @@ var courseSchema = (0, import_core.list)({
     title: (0, import_fields.text)({ validation: { isRequired: true } }),
     description: (0, import_fields.text)({ validation: { isRequired: true } }),
     slug: (0, import_fields.text)({
-      isIndexed: true,
+      isIndexed: "unique",
       validation: {
         isRequired: true,
         match: {
@@ -72,6 +92,23 @@ var courseSchema = (0, import_core.list)({
 var import_core2 = require("@keystone-6/core");
 var import_access2 = require("@keystone-6/core/access");
 var import_fields2 = require("@keystone-6/core/fields");
+
+// src/utils/alreadyEnrolledOn.ts
+function alreadyEnrolledOn(prisma, student, course) {
+  return __async(this, null, function* () {
+    const enrollmentExists = yield prisma.enrollment.findFirst({
+      where: {
+        courseId: course.connect.id,
+        studentId: student.connect.id
+      }
+    });
+    if (enrollmentExists) {
+      throw new Error(`User already enrolled`);
+    }
+  });
+}
+
+// src/schemas/enrollment.schema.ts
 var enrollmentSchema = (0, import_core2.list)({
   access: {
     operation: (0, import_access2.allOperations)(isAdmin)
@@ -88,6 +125,16 @@ var enrollmentSchema = (0, import_core2.list)({
       defaultValue: { kind: "now" },
       db: { updatedAt: true }
     })
+  },
+  hooks: {
+    validateInput(_0) {
+      return __async(this, arguments, function* ({
+        inputData: { student, course },
+        context: { prisma }
+      }) {
+        return alreadyEnrolledOn(prisma, student, course);
+      });
+    }
   },
   db: { map: "enrollments" }
 });
@@ -161,7 +208,6 @@ var dbConfig = {
   provider: "postgresql",
   url: (_a2 = process.env.DATABASE_URL) != null ? _a2 : "",
   shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL,
-  enableLogging: true,
   useMigrations: true
 };
 
