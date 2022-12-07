@@ -212,6 +212,7 @@ type Course {
   ): [Lesson!]
   lessonsCount(where: LessonWhereInput! = {}): Int
   teacher: User
+  courseEvaluation: Int
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -232,6 +233,7 @@ input CourseWhereInput {
   enrolledOn: EnrollmentManyRelationFilter
   lessons: LessonManyRelationFilter
   teacher: UserWhereInput
+  courseEvaluation: IntNullableFilter
   createdAt: DateTimeNullableFilter
   updatedAt: DateTimeNullableFilter
 }
@@ -242,11 +244,23 @@ input LessonManyRelationFilter {
   none: LessonWhereInput
 }
 
+input IntNullableFilter {
+  equals: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  not: IntNullableFilter
+}
+
 input CourseOrderByInput {
   id: OrderDirection
   title: OrderDirection
   description: OrderDirection
   slug: OrderDirection
+  courseEvaluation: OrderDirection
   createdAt: OrderDirection
   updatedAt: OrderDirection
 }
@@ -258,6 +272,7 @@ input CourseUpdateInput {
   enrolledOn: EnrollmentRelateToManyForUpdateInput
   lessons: LessonRelateToManyForUpdateInput
   teacher: UserRelateToOneForUpdateInput
+  courseEvaluation: Int
   createdAt: DateTime
   updatedAt: DateTime
 }
@@ -287,6 +302,7 @@ input CourseCreateInput {
   enrolledOn: EnrollmentRelateToManyForCreateInput
   lessons: LessonRelateToManyForCreateInput
   teacher: UserRelateToOneForCreateInput
+  courseEvaluation: Int
   createdAt: DateTime
   updatedAt: DateTime
 }

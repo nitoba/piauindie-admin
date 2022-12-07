@@ -26,16 +26,17 @@ model User {
 }
 
 model Course {
-  id          String       @id @default(cuid())
-  title       String       @default("")
-  description String       @default("")
-  slug        String       @unique @default("")
-  enrolledOn  Enrollment[] @relation("Enrollment_course")
-  lessons     Lesson[]     @relation("Lesson_course")
-  teacher     User?        @relation("Course_teacher", fields: [teacherId], references: [id])
-  teacherId   String?      @map("teacher")
-  createdAt   DateTime?    @default(now())
-  updatedAt   DateTime?    @default(now()) @updatedAt
+  id               String       @id @default(cuid())
+  title            String       @default("")
+  description      String       @default("")
+  slug             String       @unique @default("")
+  enrolledOn       Enrollment[] @relation("Enrollment_course")
+  lessons          Lesson[]     @relation("Lesson_course")
+  teacher          User?        @relation("Course_teacher", fields: [teacherId], references: [id])
+  teacherId        String?      @map("teacher")
+  courseEvaluation Int?
+  createdAt        DateTime?    @default(now())
+  updatedAt        DateTime?    @default(now()) @updatedAt
 
   @@index([teacherId])
   @@map("courses")
