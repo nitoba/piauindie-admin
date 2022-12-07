@@ -1,6 +1,7 @@
 node_modules
-.keystone
+/.keystone
 keystone.db
 *.log
 ./postgres-data
 .env
+/.keystone/config.js
