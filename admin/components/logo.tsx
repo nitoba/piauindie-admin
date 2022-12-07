@@ -1,20 +1,17 @@
-/** @jsxRuntime classic */
-/** @jsx jsx */
-import logo from '../assets/logo.jpg'
-import { jsx } from '@keystone-ui/core'
 import Link from 'next/link'
+import React from 'react'
 export function Logo() {
   return (
     <Link href="/">
       <div
-        css={{
+        style={{
           width: 50,
           borderRadius: 8,
           border: '2px solid #DDD',
           padding: 4,
         }}
       >
-        <img src={logo.src} alt="logo" css={{ width: '100%' }} />
+        <img src="../assets/logo.jpg" alt="logo" style={{ width: '100%' }} />
       </div>
     </Link>
   )

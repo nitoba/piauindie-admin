@@ -11,6 +11,13 @@ services:
       - '5432:5432'
     volumes:
       - db:/var/lib/postgresql/data
+  app:
+    container_name: 'app'
+    build: .
+    env_file:
+      - .env
+    ports:
+      - '3333:3000'
 volumes:
   db:
     driver: local

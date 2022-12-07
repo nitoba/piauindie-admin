@@ -25,28 +25,88 @@ __export(keystone_exports, {
 });
 module.exports = __toCommonJS(keystone_exports);
 var import_config = require("dotenv/config");
-var import_core2 = require("@keystone-6/core");
+var import_core4 = require("@keystone-6/core");
 
-// src/schemas/user.schema.ts
+// src/schemas/course.schema.ts
 var import_core = require("@keystone-6/core");
 var import_access = require("@keystone-6/core/access");
 var import_fields = require("@keystone-6/core/fields");
 
 // src/auth/permissions.ts
-var isAdmin = ({ session: session2 }) => session2?.data.role === "admin";
+var isAdmin = ({ session: session2 }) => (session2 == null ? void 0 : session2.data.role) === "admin";
 
-// src/schemas/user.schema.ts
-var userSchema = (0, import_core.list)({
+// src/schemas/course.schema.ts
+var courseSchema = (0, import_core.list)({
   access: {
     operation: (0, import_access.allOperations)(isAdmin)
   },
   fields: {
-    name: (0, import_fields.text)({ validation: { isRequired: true } }),
-    email: (0, import_fields.text)({
+    title: (0, import_fields.text)({ validation: { isRequired: true } }),
+    description: (0, import_fields.text)({ validation: { isRequired: true } }),
+    slug: (0, import_fields.text)({
+      isIndexed: true,
+      validation: {
+        isRequired: true,
+        match: {
+          regex: /^[a-z0-9]+(?:[_-][a-z0-9]+)*$/,
+          explanation: "The slug must only contain letters and numbers as well as (_-)"
+        }
+      }
+    }),
+    enrolledOn: (0, import_fields.relationship)({ ref: "Enrollment.course", many: true }),
+    createdAt: (0, import_fields.timestamp)({
+      defaultValue: { kind: "now" },
+      ui: { createView: { fieldMode: "hidden" } }
+    }),
+    updatedAt: (0, import_fields.timestamp)({
+      defaultValue: { kind: "now" },
+      ui: { createView: { fieldMode: "hidden" } },
+      db: { updatedAt: true }
+    })
+  },
+  ui: { label: "Courses" },
+  db: { map: "courses" }
+});
+
+// src/schemas/enrollment.schema.ts
+var import_core2 = require("@keystone-6/core");
+var import_access2 = require("@keystone-6/core/access");
+var import_fields2 = require("@keystone-6/core/fields");
+var enrollmentSchema = (0, import_core2.list)({
+  access: {
+    operation: (0, import_access2.allOperations)(isAdmin)
+  },
+  fields: {
+    student: (0, import_fields2.relationship)({
+      ref: "User.enrollments"
+    }),
+    course: (0, import_fields2.relationship)({ ref: "Course.enrolledOn" }),
+    createdAt: (0, import_fields2.timestamp)({
+      defaultValue: { kind: "now" }
+    }),
+    updatedAt: (0, import_fields2.timestamp)({
+      defaultValue: { kind: "now" },
+      db: { updatedAt: true }
+    })
+  },
+  db: { map: "enrollments" }
+});
+
+// src/schemas/user.schema.ts
+var import_core3 = require("@keystone-6/core");
+var import_access3 = require("@keystone-6/core/access");
+var import_fields3 = require("@keystone-6/core/fields");
+var userSchema = (0, import_core3.list)({
+  access: {
+    operation: (0, import_access3.allOperations)(isAdmin)
+  },
+  fields: {
+    name: (0, import_fields3.text)({ validation: { isRequired: true } }),
+    email: (0, import_fields3.text)({
       validation: { isRequired: true },
       isIndexed: "unique"
     }),
-    role: (0, import_fields.select)({
+    role: (0, import_fields3.select)({
       type: "enum",
       options: [
         { label: "isAdmin", value: "admin" },
@@ -55,24 +115,30 @@ var userSchema = (0, import_core.list)({
       validation: { isRequired: true },
       ui: { displayMode: "select" }
     }),
-    password: (0, import_fields.password)({
+    password: (0, import_fields3.password)({
       validation: { isRequired: true }
     }),
-    createdAt: (0, import_fields.timestamp)({
+    enrollments: (0, import_fields3.relationship)({ ref: "Enrollment.student", many: true }),
+    createdAt: (0, import_fields3.timestamp)({
       defaultValue: { kind: "now" }
     })
-  }
+  },
+  ui: { label: "Users" },
+  db: { map: "users" }
 });
 
 // src/schemas/index.ts
 var schemas = {
-  User: userSchema
+  User: userSchema,
+  Course: courseSchema,
+  Enrollment: enrollmentSchema
 };
 
 // src/auth/index.ts
 var import_auth = require("@keystone-6/auth");
 var import_session = require("@keystone-6/core/session");
-var sessionSecret = process.env.SESSION_SECRET ?? "default-secret";
+var _a;
+var sessionSecret = (_a = process.env.SESSION_SECRET) != null ? _a : "default-secret";
 var { withAuth } = (0, import_auth.createAuth)({
   listKey: "User",
   identityField: "email",
@@ -90,9 +156,10 @@ var session = (0, import_session.statelessSessions)({
 });
 
 // src/db-config.ts
+var _a2;
 var dbConfig = {
   provider: "postgresql",
-  url: process.env.DATABASE_URL ?? "",
+  url: (_a2 = process.env.DATABASE_URL) != null ? _a2 : "",
   shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL,
   enableLogging: true,
   useMigrations: true
@@ -105,7 +172,7 @@ var configAPI = {
   }
 };
 var keystone_default = withAuth(
-  (0, import_core2.config)({
+  (0, import_core4.config)({
     db: dbConfig,
     lists: schemas,
     session

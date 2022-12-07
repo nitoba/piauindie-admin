@@ -7,6 +7,8 @@ type User {
   email: String
   role: UserRoleType
   password: PasswordState
+  enrollments(where: EnrollmentWhereInput! = {}, orderBy: [EnrollmentOrderByInput!]! = [], take: Int, skip: Int! = 0): [Enrollment!]
+  enrollmentsCount(where: EnrollmentWhereInput! = {}): Int
   createdAt: DateTime
 }
 
@@ -34,6 +36,7 @@ input UserWhereInput {
   name: StringFilter
   email: StringFilter
   role: UserRoleTypeNullableFilter
+  enrollments: EnrollmentManyRelationFilter
   createdAt: DateTimeNullableFilter
 }
 
@@ -89,6 +92,12 @@ input UserRoleTypeNullableFilter {
   not: UserRoleTypeNullableFilter
 }
 
+input EnrollmentManyRelationFilter {
+  every: EnrollmentWhereInput
+  some: EnrollmentWhereInput
+  none: EnrollmentWhereInput
+}
+
 input DateTimeNullableFilter {
   equals: DateTime
   in: [DateTime!]
@@ -118,7 +127,15 @@ input UserUpdateInput {
   email: String
   role: UserRoleType
   password: String
+  enrollments: EnrollmentRelateToManyForUpdateInput
   createdAt: DateTime
+}
+
+input EnrollmentRelateToManyForUpdateInput {
+  disconnect: [EnrollmentWhereUniqueInput!]
+  set: [EnrollmentWhereUniqueInput!]
+  create: [EnrollmentCreateInput!]
+  connect: [EnrollmentWhereUniqueInput!]
 }
 
 input UserUpdateArgs {
@@ -131,7 +148,143 @@ input UserCreateInput {
   email: String
   role: UserRoleType
   password: String
+  enrollments: EnrollmentRelateToManyForCreateInput
   createdAt: DateTime
+}
+
+input EnrollmentRelateToManyForCreateInput {
+  create: [EnrollmentCreateInput!]
+  connect: [EnrollmentWhereUniqueInput!]
+}
+
+type Course {
+  id: ID!
+  title: String
+  description: String
+  slug: String
+  enrolledOn(where: EnrollmentWhereInput! = {}, orderBy: [EnrollmentOrderByInput!]! = [], take: Int, skip: Int! = 0): [Enrollment!]
+  enrolledOnCount(where: EnrollmentWhereInput! = {}): Int
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input CourseWhereUniqueInput {
+  id: ID
+}
+
+input CourseWhereInput {
+  AND: [CourseWhereInput!]
+  OR: [CourseWhereInput!]
+  NOT: [CourseWhereInput!]
+  id: IDFilter
+  title: StringFilter
+  description: StringFilter
+  slug: StringFilter
+  enrolledOn: EnrollmentManyRelationFilter
+  createdAt: DateTimeNullableFilter
+  updatedAt: DateTimeNullableFilter
+}
+
+input CourseOrderByInput {
+  id: OrderDirection
+  title: OrderDirection
+  description: OrderDirection
+  slug: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input CourseUpdateInput {
+  title: String
+  description: String
+  slug: String
+  enrolledOn: EnrollmentRelateToManyForUpdateInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input CourseUpdateArgs {
+  where: CourseWhereUniqueInput!
+  data: CourseUpdateInput!
+}
+
+input CourseCreateInput {
+  title: String
+  description: String
+  slug: String
+  enrolledOn: EnrollmentRelateToManyForCreateInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type Enrollment {
+  id: ID!
+  student: User
+  course: Course
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input EnrollmentWhereUniqueInput {
+  id: ID
+}
+
+input EnrollmentWhereInput {
+  AND: [EnrollmentWhereInput!]
+  OR: [EnrollmentWhereInput!]
+  NOT: [EnrollmentWhereInput!]
+  id: IDFilter
+  student: UserWhereInput
+  course: CourseWhereInput
+  createdAt: DateTimeNullableFilter
+  updatedAt: DateTimeNullableFilter
+}
+
+input EnrollmentOrderByInput {
+  id: OrderDirection
+  createdAt: OrderDirection
+  updatedAt: OrderDirection
+}
+
+input EnrollmentUpdateInput {
+  student: UserRelateToOneForUpdateInput
+  course: CourseRelateToOneForUpdateInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input UserRelateToOneForUpdateInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+  disconnect: Boolean
+}
+
+input CourseRelateToOneForUpdateInput {
+  create: CourseCreateInput
+  connect: CourseWhereUniqueInput
+  disconnect: Boolean
+}
+
+input EnrollmentUpdateArgs {
+  where: EnrollmentWhereUniqueInput!
+  data: EnrollmentUpdateInput!
+}
+
+input EnrollmentCreateInput {
+  student: UserRelateToOneForCreateInput
+  course: CourseRelateToOneForCreateInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input UserRelateToOneForCreateInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+}
+
+input CourseRelateToOneForCreateInput {
+  create: CourseCreateInput
+  connect: CourseWhereUniqueInput
 }
 
 """
@@ -146,6 +299,18 @@ type Mutation {
   updateUsers(data: [UserUpdateArgs!]!): [User]
   deleteUser(where: UserWhereUniqueInput!): User
   deleteUsers(where: [UserWhereUniqueInput!]!): [User]
+  createCourse(data: CourseCreateInput!): Course
+  createCourses(data: [CourseCreateInput!]!): [Course]
+  updateCourse(where: CourseWhereUniqueInput!, data: CourseUpdateInput!): Course
+  updateCourses(data: [CourseUpdateArgs!]!): [Course]
+  deleteCourse(where: CourseWhereUniqueInput!): Course
+  deleteCourses(where: [CourseWhereUniqueInput!]!): [Course]
+  createEnrollment(data: EnrollmentCreateInput!): Enrollment
+  createEnrollments(data: [EnrollmentCreateInput!]!): [Enrollment]
+  updateEnrollment(where: EnrollmentWhereUniqueInput!, data: EnrollmentUpdateInput!): Enrollment
+  updateEnrollments(data: [EnrollmentUpdateArgs!]!): [Enrollment]
+  deleteEnrollment(where: EnrollmentWhereUniqueInput!): Enrollment
+  deleteEnrollments(where: [EnrollmentWhereUniqueInput!]!): [Enrollment]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -172,6 +337,12 @@ type Query {
   users(where: UserWhereInput! = {}, orderBy: [UserOrderByInput!]! = [], take: Int, skip: Int! = 0): [User!]
   user(where: UserWhereUniqueInput!): User
   usersCount(where: UserWhereInput! = {}): Int
+  courses(where: CourseWhereInput! = {}, orderBy: [CourseOrderByInput!]! = [], take: Int, skip: Int! = 0): [Course!]
+  course(where: CourseWhereUniqueInput!): Course
+  coursesCount(where: CourseWhereInput! = {}): Int
+  enrollments(where: EnrollmentWhereInput! = {}, orderBy: [EnrollmentOrderByInput!]! = [], take: Int, skip: Int! = 0): [Enrollment!]
+  enrollment(where: EnrollmentWhereUniqueInput!): Enrollment
+  enrollmentsCount(where: EnrollmentWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }

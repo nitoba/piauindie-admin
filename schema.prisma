@@ -13,12 +13,42 @@ generator client {
 }
 
 model User {
-  id        String       @id @default(cuid())
-  name      String       @default("")
-  email     String       @unique @default("")
-  role      UserRoleType
-  password  String
-  createdAt DateTime?    @default(now())
+  id          String       @id @default(cuid())
+  name        String       @default("")
+  email       String       @unique @default("")
+  role        UserRoleType
+  password    String
+  enrollments Enrollment[] @relation("Enrollment_student")
+  createdAt   DateTime?    @default(now())
+
+  @@map("users")
+}
+
+model Course {
+  id          String       @id @default(cuid())
+  title       String       @default("")
+  description String       @default("")
+  slug        String       @default("")
+  enrolledOn  Enrollment[] @relation("Enrollment_course")
+  createdAt   DateTime?    @default(now())
+  updatedAt   DateTime?    @default(now()) @updatedAt
+
+  @@index([slug])
+  @@map("courses")
+}
+
+model Enrollment {
+  id        String    @id @default(cuid())
+  student   User?     @relation("Enrollment_student", fields: [studentId], references: [id])
+  studentId String?   @map("student")
+  course    Course?   @relation("Enrollment_course", fields: [courseId], references: [id])
+  courseId  String?   @map("course")
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now()) @updatedAt
+
+  @@index([studentId])
+  @@index([courseId])
+  @@map("enrollments")
 }
 
 enum UserRoleType {
