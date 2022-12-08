@@ -1,5 +1,5 @@
 import { list } from '@keystone-6/core'
-import { allOperations } from '@keystone-6/core/access'
+import { allowAll } from '@keystone-6/core/access'
 import {
   float,
   integer,
@@ -8,13 +8,18 @@ import {
   text,
   timestamp,
 } from '@keystone-6/core/fields'
-import { isAdmin } from '../auth/permissions'
+import { isAdmin, isStudent, isTeacher } from '../auth/permissions'
 import { DEFAULT_THUMBNAIL_URL_COURSE } from '../utils/contants'
 import { validationSlugs, validationURLs } from '../utils/regexs'
 
 export const courseSchema = list({
   access: {
-    operation: allOperations(isAdmin),
+    operation: {
+      create: isAdmin,
+      delete: isAdmin,
+      query: allowAll,
+      update: isTeacher || isAdmin,
+    },
   },
   fields: {
     title: text({ validation: { isRequired: true } }),
@@ -87,6 +92,6 @@ export const courseSchema = list({
       db: { updatedAt: true },
     }),
   },
-  ui: { label: 'Courses' },
+  ui: { label: 'Courses', hideCreate: isStudent },
   db: { map: 'courses' },
 })

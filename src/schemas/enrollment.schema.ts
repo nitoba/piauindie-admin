@@ -1,12 +1,17 @@
 import { list } from '@keystone-6/core'
-import { allOperations } from '@keystone-6/core/access'
+import { allowAll } from '@keystone-6/core/access'
 import { relationship, timestamp } from '@keystone-6/core/fields'
-import { isAdmin } from '../auth/permissions'
+import { isAdmin, isStudent, isTeacher } from '../auth/permissions'
 import { alreadyEnrolledOn } from '../utils/alreadyEnrolledOn'
 
 export const enrollmentSchema = list({
   access: {
-    operation: allOperations(isAdmin),
+    operation: {
+      create: isAdmin,
+      delete: isAdmin,
+      query: allowAll,
+      update: isTeacher || isAdmin,
+    },
   },
   fields: {
     student: relationship({
@@ -30,4 +35,10 @@ export const enrollmentSchema = list({
     },
   },
   db: { map: 'enrollments' },
+  ui: {
+    hideCreate: isStudent,
+    createView: {
+      defaultFieldMode: 'hidden',
+    },
+  },
 })

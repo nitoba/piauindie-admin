@@ -5,3 +5,6 @@ export const isAdmin = ({ session }: { session: Session }) =>
 
 export const isStudent = ({ session }: { session: Session }) =>
   session?.data.role === 'student'
+
+export const isTeacher = ({ session }: { session: Session }) =>
+  session?.data.role === 'teacher'

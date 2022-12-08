@@ -1,12 +1,17 @@
 import { list } from '@keystone-6/core'
-import { allOperations } from '@keystone-6/core/access'
+import { allowAll } from '@keystone-6/core/access'
 import { relationship, text, timestamp } from '@keystone-6/core/fields'
-import { isAdmin } from '../auth/permissions'
+import { isAdmin, isStudent, isTeacher } from '../auth/permissions'
 import { validationSlugs, validationURLs } from '../utils/regexs'
 
 export const lessonSchema = list({
   access: {
-    operation: allOperations(isAdmin),
+    operation: {
+      create: isTeacher || isAdmin,
+      delete: isTeacher || isAdmin,
+      query: allowAll,
+      update: isAdmin || isStudent,
+    },
   },
   fields: {
     title: text({ validation: { isRequired: true } }),
@@ -45,6 +50,6 @@ export const lessonSchema = list({
       db: { updatedAt: true },
     }),
   },
-  ui: { label: 'Lessons' },
+  ui: { label: 'Lessons', hideCreate: isStudent },
   db: { map: 'lessons' },
 })

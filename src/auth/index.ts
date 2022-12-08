@@ -6,7 +6,7 @@ const sessionSecret = process.env.SESSION_SECRET ?? 'default-secret'
 const { withAuth } = createAuth({
   listKey: 'User',
   identityField: 'email',
-  sessionData: 'email role',
+  sessionData: 'id email role',
   secretField: 'password',
   initFirstItem: {
     fields: ['name', 'email', 'password'],

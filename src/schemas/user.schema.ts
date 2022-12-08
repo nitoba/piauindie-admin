@@ -1,5 +1,5 @@
 import { list } from '@keystone-6/core'
-import { allOperations } from '@keystone-6/core/access'
+import { allowAll } from '@keystone-6/core/access'
 import {
   password,
   text,
@@ -7,11 +7,16 @@ import {
   select,
   relationship,
 } from '@keystone-6/core/fields'
-import { isAdmin } from '../auth/permissions'
+import { isAdmin, isStudent } from '../auth/permissions'
 
 export const userSchema = list({
   access: {
-    operation: allOperations(isAdmin),
+    operation: {
+      create: isAdmin,
+      delete: isAdmin,
+      query: allowAll,
+      update: isAdmin || isStudent,
+    },
   },
   fields: {
     name: text({ validation: { isRequired: true } }),
@@ -28,6 +33,7 @@ export const userSchema = list({
       ],
       validation: { isRequired: true },
       ui: { displayMode: 'select' },
+      defaultValue: 'student',
     }),
     password: password({
       validation: { isRequired: true },
@@ -40,6 +46,6 @@ export const userSchema = list({
       defaultValue: { kind: 'now' },
     }),
   },
-  ui: { label: 'Users' },
+  ui: { label: 'Users', isHidden: isStudent },
   db: { map: 'users' },
 })

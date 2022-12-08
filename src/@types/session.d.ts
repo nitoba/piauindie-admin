@@ -1,6 +1,7 @@
 export type Session = {
   data: {
     id: string
-    role: 'admin' | 'student'
+    email: string
+    role: 'admin' | 'student' | 'teacher'
   }
 }
